@@ -3,35 +3,27 @@
 var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
-var rp         = require('request-promise');
+var rp = require('request-promise');
 
+/**
+* Midleware validation token
+*
+*/
 
-
-
-
-//var JWT = {decode: _JWT.decode, sign: _JWT.sign, verify: thunkify(_JWT.verify)};
-
-
+var token    =  '';
 module.exports = function() {
-
-  var token    =  '';
   const bearer =  'bearer';
-
   return function checktoken (ctx, next) {
-
     if (ctx == null || ctx === 0 || Object.keys(ctx).length === 0){
       return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
     }else {
-
       const authorization  = ctx.request.headers.authorization;
       if (authorization) {
         var parts = authorization.split(' ');
         if (parts.length === 2 && parts[0] === bearer) {
           token = parts[1];
           ctx.state.authorizationHeader = authorization;
-          getPublicKey();
-          console.log("Verificamos");
-          verifyToken(token);
+          validateToken();
           return next();
         }else{
           return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
@@ -43,95 +35,62 @@ module.exports = function() {
   }
 }
 
-
-
-
-
-/*var koa = require('koa');
-var request = require('koa-request');
-
-var app = new koa();
-
-app.use(function *() {
-  var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
-  var publicKey="";
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-	//var response = yield request(options); //Yay, HTTP requests with no callbacks!
-	//var info = JSON.parse(response.body);
+/**
+* This function is in charge on get the public key and validate it.
+*
+*
+*/
+async function   validateToken() {
+      var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
+      console.log("serverPublicKey",serverPublicKey);
+      var publicKey="";
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
       var options = {
-      	url: serverPublicKey,
-  	    headers: { 'User-Agent': 'request' }
-  	  };
-  	  var response = yield request(options); //Yay, HTTP requests with no callbacks!
-  	  var info = JSON.parse(response.body);
-
-      var decoded = jwt.verify('eyJraWQiOiJJRFBTRVJFTklUWV9TSEExd2l0aFJTQSIsInR5cCI6IkpXVCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJ4MDIxMDk2IiwiYXVkIjoiU0FSQVNFUkVOSVRZIiwibmJmIjoxNDczNzU5ODk0LCJpc3MiOiJJRFBTRVJFTklUWSIsImV4cCI6MzYwMTQ3Mzc1OTg5NCwiaWF0IjoxNDczNzU5ODk0LCJqdGkiOiI5MDgxMTk0NS1jMjIyLTRkOWQtYWY5NS04MjAwOTRiMDg3ZmYifQ.a5hNefm9KuEfp-cjt9_-p6tSeMEVMvHVHAry175eV_dOVloPB0gKnlh4x7GbTc4egpstX0JNZzMN5pojLHj4efW-1fREIWpzyGuup4KXoqLXcJxihx22x1-Fmru2dkeY2tPVIwI99sCIn_RdwyPhDALK6WsRO3OOe8_MRSitTYfObaQLLQ-QMyrh8Yygc9FQvcxKOgH7S8dwrU4IcnUOxJAW7tCq_0xZtBd_HRfEzhCIytIfcSxw1gvRNbuxgx5ZDgwOvqgJCS4MyK6ye1Di6ZITvNq5oYNJ5aA5qyohqJ_M-Q1INaBnVO5qUIotjG0m_9WH1OcCVJr_U_86aCoDCg',
-      convertCertificate(info.key), { algorithms: ['RS256'] });
-      console.log("El decoded es: ",decoded);
-});
-
-app.listen(process.env.PORT || 8080);*/
-async function setHeader(ctx,next){
-    ctx.state.authorizationHeader = 'Key ' + "clave";
-    await next();
-}
-
-
-function  getPublicKey() {
-  var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
-  var publicKey="";
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  var options = {
-    url: serverPublicKey,
-    headers: { 'User-Agent': 'request' }
-  };
-  var response = yield request(options);
-  var info = JSON.parse(response.body);
+        url: serverPublicKey,
+        headers: { 'User-Agent': 'request' }
+      };
+      rp(serverPublicKey)
+        .then(function (htmlString) {
+          var info = JSON.parse(htmlString);
+          publicKey = info.key;
+          verifyToken(publicKey);
+        })
+        .catch(function (err) {
+            console.log("Error",err);
+        });
+      console.log("token es",publicKey);
 }
 
 /**
+* This function validate the jwt token
 *
-*
-**/
-function verifyToken(token){
-  console.log(token);
-  try{
-    var decoded = jwt.verify(token, convertCertificate(publicKey), { algorithms: ['RS256'] });
-    return true;
-  }
-  catch(err){
-    return false;
-  }
+* @param  {string} publicKey The public key.
+* @throw  error 401 if the token has expired.
+*/
+
+function verifyToken(publicKey){
+      try{
+        var decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
+      }catch(err){
+        return ctx.throw(401,"The JWT token is invalid");
+      }
+      if (decoded.exp < Date.now() / 1000) {
+          return ctx.throw(401,"This JWT has expired");
+      }
 }
 
-
-function convertCertificate(input){
-  var header = "-----BEGIN PUBLIC KEY-----\n";
-  var end = "\n-----END PUBLIC KEY-----";
-  var enter = "\n";
-  var cont = 1;
-  var output = '';
-  for(var i=0; i<input.length; i++){
-    output = output + input.charAt(i);
-    if(cont == 64){
-      output = output + enter;
-      cont = 0;
-    }
-    cont = cont +1;
-  }
-  output = header + output + end;
-  return output;
-}
-
-function checkAuthorizationHeader(opts){
-  if (!this.header || !this.header.authorization){
-    this.throw("JWT token is bad formatted",401);
-  }
-
-  var parts = this.header.authorization.split(' ');
-  if (parts.length == 2 && parts[0] === bearer)
-    return parts[1];
-  else
-    this.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
-
+/**
+* This function convert the key to a pem file.
+*
+* @param  {string} input The text to convert a pem file.
+* @return {String} The resolved token
+*/
+function base64toPem(input){
+  console.log(input);
+  var begin = "-----BEGIN PUBLIC KEY-----\n";
+  var end   = "-----END PUBLIC KEY-----"
+  for(var result="", lines=0;result.length-lines < input.length;lines++) {
+          result+=input.substr(result.length-lines,64)+"\n"
+      }
+  return begin + result + end;
 }
