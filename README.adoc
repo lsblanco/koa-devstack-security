@@ -1,3 +1,24 @@
+= DevStack token JWT validation
+
+Koa middleware that propagates JSON web tokens (JWT) and validate the token.
+
+== Usage
+
+Our architecture, is validate with the use of a JWT token, so is mandatory propagate and validate the JWT token.
+
+=== When do the library return an 401, Bad Authorization?
+
+. If the token has bad format,
+. If the date has expired.
+. If the token is not authorization.
+. If the header is bad formatted.
+
+=== Retrieving the token
+
+The token is normally provided in a HTTP header in our case ( Authorization ),
+so we can get the token with 'ctx.request.header.authorization'.
+
+== Example
 ```js
 var validationToken = require('koa-devstack-validation');
 var Koa = require('koa');

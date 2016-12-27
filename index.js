@@ -4,6 +4,7 @@ var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
 var rp = require('request-promise');
+var http = require('http');
 
 
 //https://www.npmjs.com/package/promise-retry
@@ -11,7 +12,6 @@ var rp = require('request-promise');
 * Midleware validation token
 *
 */
-
 var token    =  '';
 module.exports = function() {
   const bearer =  'bearer';
@@ -31,7 +31,7 @@ module.exports = function() {
           return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
         }
       }else{
-        return ctx.throw(401,"JWT token is mandatory");
+        return ctx.throw(401,'JWT token is mandatory');
       }
     }
   }
@@ -39,25 +39,30 @@ module.exports = function() {
 
 /**
 * This function is in charge on get the public key and validate it.
-*
-*
 */
-async function   validateToken() {
+function   validateToken() {
       var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
-      console.log("serverPublicKey",serverPublicKey);
+      console.log('serverPublicKey',serverPublicKey);
       var publicKey="";
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-      rp(serverPublicKey)
-        .then(function (htmlString) {
-          var info = JSON.parse(htmlString);
-          publicKey = info.key;
-          verifyToken(publicKey);
-        })
-        .catch(function (err) {
-            console.log("Error",err);
-        });
-      console.log("token es",publicKey);
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      var attempts = config.attempts;
+      var continue = false;
+      while (continue == false|| attempts > 0){
+        rp(serverPublicKey)
+          .delay(1000)
+          .then(function (htmlString) {
+            continue = true;
+            var info = JSON.parse(htmlString);
+            publicKey = info.key;
+            verifyToken(publicKey);
+          })
+          .catch(function (err) {
+              attempts = attempts - 1;
+              console.log('Error',err);
+          });
+      }
 }
+
 
 /**
 * This function validate the jwt token
@@ -70,10 +75,10 @@ function verifyToken(publicKey){
       try{
         var decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
       }catch(err){
-        return ctx.throw(401,"The JWT token is invalid");
+        return ctx.throw(401,'The JWT token is invalid');
       }
       if (decoded.exp < Date.now() / 1000) {
-          return ctx.throw(401,"This JWT has expired");
+          return ctx.throw(401,'This JWT has expired');
       }
 }
 
@@ -85,8 +90,8 @@ function verifyToken(publicKey){
 */
 function base64toPem(input){
   console.log(input);
-  var begin = "-----BEGIN PUBLIC KEY-----\n";
-  var end   = "-----END PUBLIC KEY-----"
+  var begin = '-----BEGIN PUBLIC KEY-----\n';
+  var end   = '-----END PUBLIC KEY-----';
   for(var result="", lines=0;result.length-lines < input.length;lines++) {
           result+=input.substr(result.length-lines,64)+"\n"
       }
