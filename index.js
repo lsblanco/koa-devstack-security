@@ -5,6 +5,8 @@ var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
 var rp = require('request-promise');
 
+
+//https://www.npmjs.com/package/promise-retry
 /**
 * Midleware validation token
 *
@@ -45,10 +47,6 @@ async function   validateToken() {
       console.log("serverPublicKey",serverPublicKey);
       var publicKey="";
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-      var options = {
-        url: serverPublicKey,
-        headers: { 'User-Agent': 'request' }
-      };
       rp(serverPublicKey)
         .then(function (htmlString) {
           var info = JSON.parse(htmlString);

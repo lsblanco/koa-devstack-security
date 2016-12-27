@@ -1,0 +1,8 @@
+```js
+var validationToken = require('koa-devstack-validation');
+var Koa = require('koa');
+
+var app = new Koa();
+app.use(validationToken());
+
+```
