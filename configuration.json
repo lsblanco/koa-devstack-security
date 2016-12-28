@@ -3,6 +3,7 @@
     "url":"https://security-srv-keymanager-serenity-identity-pre.appls.boae.paas.gsnetcloud.corp/v1/publicKey",
     "defaultkey":"defaultkey",
     "keyIdentifier":"sts_SHA1withRSA",
-    "attemps":3
+    "attempts":3,
+    "delay":5000
   }
 }

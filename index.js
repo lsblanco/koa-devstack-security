@@ -3,11 +3,11 @@
 var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
-var rp = require('request-promise');
+var rp         = require('request-promise');
 
 
 /**
-* Midleware validation token
+* Midleware validation and propagation token
 *
 */
 var token;
