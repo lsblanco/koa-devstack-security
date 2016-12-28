@@ -4,18 +4,17 @@ var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
 var rp = require('request-promise');
-var http = require('http');
 
 
-//https://www.npmjs.com/package/promise-retry
 /**
 * Midleware validation token
 *
 */
-var token    =  '';
-module.exports = function() {
+var token;
+var publicKey;
+module.exports = function(opts) {
   const bearer =  'bearer';
-  return function checktoken (ctx, next) {
+  return async function checktoken (ctx, next) {
     if (ctx == null || ctx === 0 || Object.keys(ctx).length === 0){
       return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
     }else {
@@ -25,7 +24,8 @@ module.exports = function() {
         if (parts.length === 2 && parts[0] === bearer) {
           token = parts[1];
           ctx.state.authorizationHeader = authorization;
-          validateToken();
+          await  getPublicKey(ctx);
+          verifyToken(ctx,publicKey);
           return next();
         }else{
           return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
@@ -37,32 +37,45 @@ module.exports = function() {
   }
 }
 
+
 /**
-* This function is in charge on get the public key and validate it.
+* This method call to server public key and get it.
+* @param {ctx} ctx , application koa context
 */
-function   validateToken() {
-      var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
-      console.log('serverPublicKey',serverPublicKey);
-      var publicKey="";
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-      var attempts = config.attempts;
-      var continue = false;
-      while (continue == false|| attempts > 0){
-        rp(serverPublicKey)
-          .delay(1000)
-          .then(function (htmlString) {
-            continue = true;
-            var info = JSON.parse(htmlString);
-            publicKey = info.key;
-            verifyToken(publicKey);
-          })
-          .catch(function (err) {
-              attempts = attempts - 1;
-              console.log('Error',err);
-          });
-      }
+async function getPublicKey(ctx){
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  var serverPublicKey = config.publicKeyProvider.url + '/' + config.publicKeyProvider.keyIdentifier;
+  var attempts = config.publicKeyProvider.attempts;
+  while(attempts > 0){
+    await rp(serverPublicKey)
+      .then(function (htmlString) {
+        var info = JSON.parse(htmlString);
+        publicKey = info.key;
+        return;
+      })
+      .catch(function (err) {
+        sleep(config.publicKeyProvider.delay);
+        if (attempts > 1){
+          attempts = attempts - 1;
+        }else{
+          return ctx.throw(405, 'public key server is not enabled');
+        }
+    });
+  }
 }
 
+/**
+* Sleep function, wait n miliseconds
+* @param {integer} miliseconds number of miliseconds to wait
+*/
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
 
 /**
 * This function validate the jwt token
@@ -71,14 +84,11 @@ function   validateToken() {
 * @throw  error 401 if the token has expired.
 */
 
-function verifyToken(publicKey){
+function verifyToken(ctx, publicKey){
       try{
-        var decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
+         decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
       }catch(err){
-        return ctx.throw(401,'The JWT token is invalid');
-      }
-      if (decoded.exp < Date.now() / 1000) {
-          return ctx.throw(401,'This JWT has expired');
+        return ctx.throw(405, 'The Token is Invalid and the verification fail\n');
       }
 }
 
@@ -89,7 +99,6 @@ function verifyToken(publicKey){
 * @return {String} The resolved token
 */
 function base64toPem(input){
-  console.log(input);
   var begin = '-----BEGIN PUBLIC KEY-----\n';
   var end   = '-----END PUBLIC KEY-----';
   for(var result="", lines=0;result.length-lines < input.length;lines++) {

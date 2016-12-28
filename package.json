@@ -14,35 +14,33 @@
   ],
   "author": "Noel Rodriguez",
   "license": "ISC",
-  "devDependencies":{
-     "mocha": "^3.0.2",
-     "mochawesome": "^1.5.1",
-     "supertest": "^2.0.0",
-     "chai": "^3.5.0",
-     "nodemon": "^1.9.2"
-
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "mochawesome": "^1.5.1",
+    "nodemon": "^1.9.2",
+    "supertest": "^2.0.0"
   },
   "dependencies": {
     "koa": "^2.0.0-alpha.4",
     "koa-bodyparser": "^3.2.0",
     "jsonwebtoken": "5.x.x",
     "app-root-path": "^1.3.0",
-    "request-promise":  "4.1.1"
-
+    "request-promise": "4.1.1"
   },
   "engines": {
     "node": ">= 4"
   },
-  "publishConfig" : {
-    "registry" : "https://nexus.ci.gsnet.corp/nexus/content/repositories/npm-private"
+  "publishConfig": {
+    "registry": "https://nexus.ci.gsnet.corp/nexus/content/repositories/npm-private"
   },
-  "maintainers":[
+  "maintainers": [
     {
-      "name" : "Noel Rodríguez",
-      "email" : "noel.rodriguez@extern.isban.com"
+      "name": "Noel Rodríguez",
+      "email": "noel.rodriguez@extern.isban.com"
     },
     {
-      "name" : "Mario Vinuesa",
+      "name": "Mario Vinuesa",
       "email": "mvinuesa@extern.isban.com"
     }
   ],

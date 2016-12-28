@@ -1,14 +1,24 @@
 = DevStack token JWT validation
 
-Koa middleware that propagates JSON web tokens (JWT) and validate the token.
+Koa middleware that propagates and validates JSON web tokens (JWT).
 
 == Usage
 
 Our architecture, is validate with the use of a JWT token, so is mandatory propagate and validate the JWT token.
 
+=== Configuration
+
+Before use the koa-devstack-validation is necessary configurate de file
+configuration.json, this file needs to:
+
+. Url to get te public key.
+. The key of identifier in our case sts_SHA1withRSA.
+. The delay between calls to public server key.
+. The attempts number when fail the public server key.
+
 === When do the library return an 401, Bad Authorization?
 
-. If the token has bad format,
+. If the token has bad format.
 . If the date has expired.
 . If the token is not authorization.
 . If the header is bad formatted.
@@ -27,3 +37,7 @@ var app = new Koa();
 app.use(validationToken());
 
 ```
+
+== Additional Information
+If you want to use this library, you need at least node v.6.9.2 and
+Harmony or Babel.
