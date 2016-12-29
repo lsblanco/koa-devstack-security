@@ -4,8 +4,6 @@ var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
 var rp         = require('request-promise');
-var nodegit    = require('nodegit-flow');
-
 
 /**
 * Midleware validation and propagation token
