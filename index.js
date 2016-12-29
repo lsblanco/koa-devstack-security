@@ -4,6 +4,7 @@ var jwt        = require('jsonwebtoken');
 var appRoot    = require('app-root-path');
 var config     = require(appRoot + '/configuration.json');
 var rp         = require('request-promise');
+var nodegit    = require('nodegit-flow');
 
 
 /**
@@ -51,6 +52,7 @@ async function getPublicKey(ctx){
       .then(function (htmlString) {
         var info = JSON.parse(htmlString);
         publicKey = info.key;
+        attempts = 0;
         return;
       })
       .catch(function (err) {
@@ -85,11 +87,12 @@ function sleep(milliseconds) {
 */
 
 function verifyToken(ctx, publicKey){
-      try{
-         decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
-      }catch(err){
-        return ctx.throw(405, 'The Token is Invalid and the verification fail\n');
-      }
+  var decoded;
+  try{
+   decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
+  }catch(err){
+    return ctx.throw(403, 'The Token is Invalid and the verification fail\n');
+  }
 }
 
 /**
