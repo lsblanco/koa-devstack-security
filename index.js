@@ -99,11 +99,11 @@ function verifyToken(ctx, publicKey){
 * @param  {string} input The text to convert a pem file.
 * @return {String} The resolved token
 */
-function base64toPem(input){
+function base64toPem(token){
   var begin = '-----BEGIN PUBLIC KEY-----\n';
   var end   = '-----END PUBLIC KEY-----';
-  for(var result="", lines=0;result.length-lines < input.length;lines++) {
-          result+=input.substr(result.length-lines,64)+"\n"
+  for(var result="", lines=0;result.length-lines < token.length;lines++) {
+          result+=token.substr(result.length-lines,64)+"\n"
       }
   return begin + result + end;
 }

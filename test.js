@@ -2,7 +2,7 @@
 
 const koajwt  = require('./index')
 const request = require('supertest')
-var koa     = require('koa');
+var koa       = require('koa');
 
 
 //  const app = new Koa();
