@@ -17,6 +17,10 @@ coverage
 .lock-wscript
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
+## Sonar
+.sonar/
+## Istanbul coverage
+coverage/
 # Dependency directories
 node_modules
 jspm_packages

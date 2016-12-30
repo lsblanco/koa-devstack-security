@@ -1,13 +1,21 @@
-'use strict'
+'use strict';
 
-var jwt        = require('jsonwebtoken');
-var appRoot    = require('app-root-path');
-var config     = require(appRoot + '/configuration.json');
-var rp         = require('request-promise');
+var jwt = require('jsonwebtoken');
+var appRoot = require('app-root-path');
+var config = require(appRoot + '/configuration.json');
+var rp = require('request-promise');
 
 /**
-* Midleware validation and propagation token
+* @fileOverview Midleware propagation and validation JWT token.
 *
+* @author Noel Rodriguez
+* @version 1.0.0
+*
+* @example
+* var koa = require('koa');
+* var koaPropagation = require(koa-devstack-propagation);
+* var app = new koa();
+* app.use(koaPropagation());
 */
 var token;
 var publicKey;
@@ -103,7 +111,7 @@ function base64toPem(token){
   var begin = '-----BEGIN PUBLIC KEY-----\n';
   var end   = '-----END PUBLIC KEY-----';
   for(var result="", lines=0;result.length-lines < token.length;lines++) {
-          result+=token.substr(result.length-lines,64)+"\n"
+          result+=token.substr(result.length-lines,64)+'\n'
       }
   return begin + result + end;
 }

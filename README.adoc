@@ -8,10 +8,10 @@ Our architecture, is validate with the use of a JWT token, so is mandatory propa
 
 === Configuration
 
-Before use the koa-devstack-validation is necessary configurate de file
+Before use the koa-devstack-validation is necessary configurate the file
 configuration.json, this file needs to:
 
-. Url to get te public key.
+. Url to get the public key.
 
 . The key of identifier in our case sts_SHA1withRSA.
 
@@ -45,3 +45,18 @@ app.use(validationToken());
 
 If you want to use this library, you need at least node v.6.9.2 and
 Harmony or Babel.
+
+== How do I pass source quality?
+
+If you have passed istanbul, the *coverage* folder has been created.
+
+We use *sonar-project.properties* and *sonar-scanner* for analyze this project with SonarQube.
+
+This SonarQube must have installed http://docs.sonarqube.org/display/PLUG/JavaScript+Plugin[*javascript plugin*].
+
+Install http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner[*sonar-scanner*]:
+
+Config *sonar.host.url* with the SonarQube server url.
+
+*sonar-runner -Dsonar.host.url=sonarUrl*
+

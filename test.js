@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 
-const koajwt  = require('./index')
-const request = require('supertest')
+const koajwt  = require('./index');
+const request = require('supertest');
 var koa       = require('koa');
 
 
