@@ -1,5 +1,5 @@
 {
-  "name": "serenity-devstack-JWT-Validation",
+  "name": "koa-devstack-security",
   "version": "1.0.0-SNAPSHOT",
   "description": "JWT token propagation and validation",
   "main": "index.js",

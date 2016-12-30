@@ -8,7 +8,7 @@ Our architecture, is validate with the use of a JWT token, so is mandatory propa
 
 === Configuration
 
-Before use the koa-devstack-validation is necessary configurate the file
+Before use the koa-devstack-security is necessary configurate the file
 configuration.json, this file needs to:
 
 . Url to get the public key.
@@ -33,11 +33,11 @@ so we can get the token with 'ctx.request.header.authorization'.
 
 == Example
 ```js
-var validationToken = require('koa-devstack-validation');
+var koaDevSec = require('koa-devstack-security');
 var Koa = require('koa');
 
 var app = new Koa();
-app.use(validationToken());
+app.use(koaDevSec());
 
 ```
 

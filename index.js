@@ -13,9 +13,9 @@ var rp = require('request-promise');
 *
 * @example
 * var koa = require('koa');
-* var koaPropagation = require(koa-devstack-propagation);
+* var koaSec = require(koa-devstack-security);
 * var app = new koa();
-* app.use(koaPropagation());
+* app.use(koaSec());
 */
 var token;
 var publicKey;
