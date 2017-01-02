@@ -6,7 +6,7 @@ var config = require(appRoot + '/configuration.json');
 var rp = require('request-promise');
 
 /**
-* @fileOverview Midleware propagation and validation JWT token.
+* @fileOverview Middleware propagation and validation JWT token.
 *
 * @author Noel Rodriguez
 * @version 1.0.0
@@ -20,7 +20,7 @@ var rp = require('request-promise');
 var token;
 var publicKey;
 module.exports = function(opts) {
-  const bearer =  'bearer';
+  const bearer =  'Bearer';
   return async function checktoken (ctx, next) {
     if (ctx == null || ctx === 0 || Object.keys(ctx).length === 0){
       return ctx.throw(401, 'Bad Authorization header format. Format is "Authorization: Bearer <token>"\n');
@@ -73,8 +73,8 @@ async function getPublicKey(ctx){
 }
 
 /**
-* Sleep function, wait n miliseconds
-* @param {integer} miliseconds number of miliseconds to wait
+* Sleep function, wait n milliseconds
+* @param {integer} milliseconds number of miliseconds to wait
 */
 function sleep(milliseconds) {
   var start = new Date().getTime();
