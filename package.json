@@ -1,6 +1,6 @@
 {
   "name": "koa-devstack-security",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JWT token propagation and validation",
   "main": "index.js",
   "scripts": {
