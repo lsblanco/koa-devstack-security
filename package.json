@@ -1,17 +1,22 @@
 {
   "name": "koa-devstack-security",
-  "version": "1.0.0-SNAPSHOT",
+  "version": "1.0.0",
   "description": "JWT token propagation and validation",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- --compilers js:babel-core/register --require babel-polyfill",
     "build": "npm build"
   },
-  "homepage": "https://serenity-gitlab.alm.gsnetcloud.corp/serenity-devstack-node/serenity-devstack-propagation",
+  "homepage": "https://github.com/serenity-devstack/koa-devstack-security",
   "keywords": [
     "authorization",
+    "propagation",
     "jwt"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serenity-devstack/koa-devstack-security.git"
+  },
   "author": "Noel Rodriguez",
   "license": "ISC",
   "devDependencies": {
@@ -33,10 +38,7 @@
     "request-promise": "4.1.1"
   },
   "engines": {
-    "node": ">= 4"
-  },
-  "publishConfig": {
-    "registry": "https://nexus.ci.gsnet.corp/nexus/content/repositories/npm-private"
+    "node": ">= 7"
   },
   "maintainers": [
     {
