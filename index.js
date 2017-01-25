@@ -63,9 +63,11 @@ async function getPublicKey(ctx){
       })
       .catch(function (err) {
         sleep(config.publicKeyProvider.delay);
-        if (attempts > 1){
+        if (attempts > 0){
+          console.warn('Attempts: ' + attempts + ' error connect to: ', serverPublicKey);
           attempts = attempts - 1;
         }else{
+          console.error('Error connectiong to: ' + serverPublicKey, err);
           return ctx.throw(405, 'public key server is not enabled');
         }
     });
@@ -94,9 +96,10 @@ function sleep(milliseconds) {
 
 function verifyToken(ctx, publicKey){
   var decoded;
-  try{
+  try {
    decoded = jwt.verify(token, base64toPem(publicKey), { algorithms: ['RS256'] });
-  }catch(err){
+  } catch(err) {
+    console.error('Error verification token: ', err);
     return ctx.throw(403, 'The Token is Invalid and the verification fail\n');
   }
 }
@@ -110,8 +113,10 @@ function verifyToken(ctx, publicKey){
 function base64toPem(token){
   var begin = '-----BEGIN PUBLIC KEY-----\n';
   var end   = '-----END PUBLIC KEY-----';
-  for(var result="", lines=0;result.length-lines < token.length;lines++) {
-          result+=token.substr(result.length-lines,64)+'\n'
-      }
+  for(var result='', lines=0;result.length-lines < token.length;lines++) {
+    result+=token.substr(result.length-lines,64)+'\n'
+  }
   return begin + result + end;
 }
+
+
