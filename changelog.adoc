@@ -1,4 +1,10 @@
 = Changelog
 
+== 1.0.2
+* Fix: Add more traces.
+
+== 1.0.1
+* Fix: Add README.md and .npmignore
+
 == 1.0.0
 * Koa middleware that propagates and validates JSON web token (JWT)
